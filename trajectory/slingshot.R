@@ -7,7 +7,7 @@ library(RANN)
 library(cowplot)
 library(zoo)
 
-harmony_df <- read.csv("data_bio/harmony_coords_mono_excluded.csv", row.names = 1)
+harmony_df <- read.csv("data_bio/harmony_coords_mono_authors.csv", row.names = 1)
 harmony_reduced <- as.matrix(harmony_df[, 1:20]) 
 labels_df <- read.csv("data_bio/cluster_labels_mono.csv")
 umap_df <- read.csv("data_bio/covid_mono_umap.csv")
@@ -30,57 +30,74 @@ colData(sce_sub)$full_clustering <- labels_sub
 sce_sub <- slingshot(sce_sub, clusterLabels = 'full_clustering', 
                      reducedDim = "HARMONY", start.clus = "CD14_mono", approx_points = 150) 
 
+umap_sub <- umap_coords[idx_sub, ]
+colnames(umap_sub) <- c("UMAP1", "UMAP2")
+reducedDim(sce_sub, "UMAP") <- umap_sub
+
+emb <- embedCurves(sce_sub, "UMAP")
+curves <- do.call(rbind, lapply(seq_along(slingCurves(emb)), function(i) {
+  cv <- slingCurves(emb)[[i]]
+  d <- as.data.frame(cv$s[cv$ord, ])
+  colnames(d) <- c("UMAP1", "UMAP2")
+  d$Lineage <- paste0("Lineage", i)
+  d
+}))
+
+colnames(sce_sub) <- rownames(harmony_df)[idx_sub]
+
 pt <- slingPseudotime(sce_sub)
-crv <- slingCurves(sce_sub)
 
-pseudotime_vec <- pt[, 1] 
-
-df_plot <- data.frame(
-  UMAP1 = umap_coords[, 1],
-  UMAP2 = umap_coords[, 2],
-  Cluster = cluster_labels,
-  Pseudotime = NA
+df <- data.frame(
+  UMAP1    = umap_sub[, 1],
+  UMAP2    = umap_sub[, 2],
+  Cluster  = labels_sub,
+  Lineage1 = pt[, "Lineage1"],
+  Lineage2 = pt[, "Lineage2"]
 )
 
-df_plot$Pseudotime[idx_sub] <- pseudotime_vec
+write.csv(curves, "data_bio/slingshot_curves_author_umap.csv", row.names = FALSE)
 
-curve_coords <- crv[[1]]$s[crv[[1]]$ord, ]
-harmony_sub <- harmony_reduced[idx_sub, , drop = FALSE]
+cent <- aggregate(cbind(UMAP1, UMAP2) ~ Cluster, df, median)
+arr  <- arrow(length = unit(0.25, "cm"), type = "closed")
 
-nn_result <- nn2(data = curve_coords, query = harmony_sub, k = 1)
-nearest_cells <- nn_result$nn.idx[, 1]
+p_cl <- ggplot(df, aes(UMAP1, UMAP2, color = Cluster)) +
+  geom_point(size = 0.4, alpha = 0.5) +
+  geom_path(data = curves, aes(UMAP1, UMAP2, group = Lineage),
+            color = "black", linewidth = 1, arrow = arr, inherit.aes = FALSE) +
+  geom_text(data = cent, aes(UMAP1, UMAP2, label = Cluster),
+            color = "black", size = 3, fontface = "bold", inherit.aes = FALSE) +
+  theme_classic() + theme(legend.position = "none") +
+  labs(title = "Clusters + lineages")
 
-umap_curve <- umap_coords[idx_sub[nearest_cells], , drop = FALSE]
+plot_pt <- function(lname) {
+  d <- df[order(!is.na(df[[lname]])), ]
+  ggplot(d, aes(UMAP1, UMAP2, color = .data[[lname]])) +
+    geom_point(size = 0.4, alpha = 0.6) +
+    geom_path(data = subset(curves, Lineage == lname), aes(UMAP1, UMAP2),
+              color = "black", linewidth = 1, arrow = arr, inherit.aes = FALSE) +
+    scale_color_viridis_c(option = "plasma", na.value = "grey88") +
+    theme_classic() + labs(title = paste(lname, "pseudotime"), color = "PT")
+}
 
-curve_umap <- data.frame(
-  UMAP1 = umap_curve[, 1],
-  UMAP2 = umap_curve[, 2],
-  PT = pseudotime_vec[nearest_cells] 
-)
+p_all <- plot_grid(p_cl, plot_pt("Lineage1"), plot_pt("Lineage2"), ncol = 3)
+print(p_all)
 
-curve_umap <- curve_umap[!is.na(curve_umap$PT), ]
-curve_umap <- curve_umap[order(curve_umap$PT), ]
+ggsave("data_bio/slingshot_author_umap.png", p_all, width = 18, height = 7, dpi = 200)
 
-curve_umap$UMAP1 <- zoo::rollmean(curve_umap$UMAP1, k = 5, fill = "extend")
-curve_umap$UMAP2 <- zoo::rollmean(curve_umap$UMAP2, k = 5, fill = "extend")
+pt_out <- as.data.frame(slingPseudotime(sce_sub))
+pt_out$cell_id <- colnames(sce_sub)
+write.csv(pt_out, "data_bio/slingshot_pt_authors.csv", row.names = FALSE)
 
-p1 <- ggplot(df_plot, aes(x = UMAP1, y = UMAP2, color = Cluster)) +
-  geom_point(size = 0.5, alpha = 0.6) +
-  theme_classic() +
-  labs(title = "Monocyte clasters", x = "UMAP1", y = "UMAP2")
+lin <- slingLineages(sce_sub)
+writeLines(sapply(names(lin), function(n) paste(n, paste(lin[[n]], collapse = " > "))),
+           "data_bio/slingshot_lineages_authors.txt")
+print(lin)
 
-p2 <- ggplot() +
-  geom_point(data = df_plot, aes(x = UMAP1, y = UMAP2, color = Pseudotime), 
-             size = 0.5, alpha = 0.6) +
-  geom_path(data = curve_umap, aes(x = UMAP1, y = UMAP2), 
-            color = "black", linewidth = 0.8, alpha = 0.7) +
-  scale_color_viridis_c(option = "plasma", na.value = "lightgrey") +
-  theme_classic() +
-  labs(title = "Slingshot Pseudotime", x = "UMAP1", y = "UMAP2")
-
-print(plot_grid(p1, p2, ncol = 2))
-
-write.csv(
-  data.frame(cell_id = rownames(harmony_df)[idx_sub], pseudotime = pseudotime_vec),
-  "data_bio/slingshot_pseudotime_30pc.csv", row.names = FALSE
-)
+curves20 <- do.call(rbind, lapply(seq_along(slingCurves(sce_sub)), function(i) {
+  cv <- slingCurves(sce_sub)[[i]]
+  d <- as.data.frame(cv$s[cv$ord, ])
+  d$Lineage <- paste0("Lineage", i)
+  d$order <- seq_len(nrow(d))
+  d
+}))
+write.csv(curves20, "data_bio/slingshot_curves_author_20D.csv", row.names = FALSE)

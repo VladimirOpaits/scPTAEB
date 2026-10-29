@@ -1,0 +1,43 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+\usepackage[numbers]{natbib}
+
+\title{Scientific Report Template}
+\author{Vladimir Opait}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+A short abstract in English.
+\end{abstract}
+
+\section{Introduction}
+This is the introduction.
+
+\section{Methods}
+We took the monocyte cells CD14, CD16, C1CD16, Monocyte prolif and CD83 from covid 2019 dataset
+from Single-cell multi-omics analysis of the immune response in COVID-19 paper
+\cite{stephenson2021single},and made the slingshot trajectory above the Harmony integrated 
+full RNA seq data and above the same data, but excluded top 10 marker genes in monocyte 
+differentiation program: 
+
+
+\section{Results}
+Present the results here.
+
+\section{Conclusion}
+Summarize the findings.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
