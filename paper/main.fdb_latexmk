@@ -1,15 +1,15 @@
 # Fdb version 4
-["bibtex main"] 1793307536.93616 "main.aux" "main.bbl" "main" 1793315671.88576 0
+["bibtex main"] 1793318155.25702 "main.aux" "main.bbl" "main" 1793318173.44698 0
   "./references.bib" 1793307454.41289 411 6a0a35c742c8b13cbc1bc20bba8a8dec ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "main.aux" 1793315671.68752 756 f7131c0cfc3dba09f67c084609279aa2 "pdflatex"
+  "main.aux" 1793318173.21831 756 f7131c0cfc3dba09f67c084609279aa2 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1793315670.97579 "/home/vlad/vaeae/paper/main.tex" "main.pdf" "main" 1793315671.8865 0
+["pdflatex"] 1793318172.53697 "/home/vlad/vaeae/paper/main.tex" "main.pdf" "main" 1793318173.44759 0
   "/etc/texmf/web2c/texmf.cnf" 1766155263.98693 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/vlad/vaeae/paper/main.tex" 1793315670.67231 1011 cc2d79c05729b60c56b5181fcca67504 ""
+  "/home/vlad/vaeae/paper/main.tex" 1793318172.19637 1028 a000ee93617a3bf99d1a046d48636991 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1095.tfm" 1136768653 3584 21b378cca2e40816b0e6d74a4dc98f04 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1728.tfm" 1136768653 3584 ad49a18d8515beef6d92d4d3f197d0fd ""
@@ -95,10 +95,10 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1707919699 40399 f2c302f7d2af602abb742093540a5834 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1789984746.88841 367944 927ff0313bdc8f584c2b5257803b2be6 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1789984754 7531422 50da426cef051d68056171cdc47f26a4 ""
-  "main.aux" 1793315671.68752 756 f7131c0cfc3dba09f67c084609279aa2 "pdflatex"
-  "main.bbl" 1793307536.97297 277 495b61c01d55974c541e2fda056f5bbe "bibtex main"
-  "main.out" 1793315671.68852 352 85b7a08761b57a526d6013cabb45415e "pdflatex"
-  "main.tex" 1793315670.67231 1011 cc2d79c05729b60c56b5181fcca67504 ""
+  "main.aux" 1793318173.21831 756 f7131c0cfc3dba09f67c084609279aa2 "pdflatex"
+  "main.bbl" 1793318155.30319 277 495b61c01d55974c541e2fda056f5bbe "bibtex main"
+  "main.out" 1793318173.21931 352 85b7a08761b57a526d6013cabb45415e "pdflatex"
+  "main.tex" 1793318172.19637 1028 a000ee93617a3bf99d1a046d48636991 ""
   (generated)
   "main.aux"
   "main.log"
